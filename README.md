@@ -1,8 +1,29 @@
 # DS5Dongle — Studio
 
+## Enhanced UI fork
+
+This fork adds an interactive, keyboard-accessible device manager to
+[artzox/DS5Dongle-Studio](https://github.com/artzox/DS5Dongle-Studio).
+
+- Independent L2/R2 tension editors with sliders and illustrative pull diagrams.
+- Haptics mix and stick-response previews, with clearly grouped settings.
+- Labeled switches, visible explanations, exact-value entry, and expandable advanced controls.
+- Responsive macro and profile-slot cards, accessible control names, and keyboard focus that survives edits.
+
+Settings use the existing firmware fields and explicit save commands. The previews
+illustrate configuration rather than measuring physical motor response. Firmware
+source and upstream release binaries are unchanged by this UI update.
+
+The portal regression suite covers all 145 settings; browser checks cover keyboard
+interaction and desktop/mobile layouts. Hardware behavior still needs validation
+with a connected dongle. To run the regression suite: `sh tools/run-portal-tests.sh`
+(requires Node.js and Python 3).
+
+---
+
 **Version 1.42.0**
 
-▶️ **[Configure in your browser](https://artzox.github.io/DS5Dongle-Studio/ds5-config-portal.html)** — the config portal can run as a web page, no download required. Needs Chrome or Edge, with the dongle plugged in.
+▶️ **[Configure in your browser — enhanced UI](https://nick-s5.github.io/DS5Dongle-Studio/ds5-config-portal.html)** — the config portal can run as a web page, no download required. Needs Chrome or Edge, with the dongle plugged in.
 
 💾 **[Downloads, source and releases on GitHub](https://github.com/artzox/DS5Dongle-Studio)** — the firmware `.uf2` files live under *Releases*.
 

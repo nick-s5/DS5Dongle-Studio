@@ -14,6 +14,8 @@ node tools/portal-coverage-test.js
 node tools/portal-render-test.js
 node tools/portal-attr-test.js
 node tools/portal-align-test.js
+node tools/portal-tension-test.js
+node tools/portal-studio-test.js
 node tools/portal-validate-test.js
 node tools/portal-dedup-test.js
 node tools/portal-reader-test.js

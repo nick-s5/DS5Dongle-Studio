@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DS5 Bridge Config (POC)</title>
+<title>DS5 Studio — Enhanced Device Manager</title>
 <style>
   :root { --bg:#0f1115; --card:#1a1d24; --border:#2a2f3a; --text:#e6e8ec; --sub:#9aa0aa; --accent:#4ea1ff; --green:#3fb950; --red:#f85149; }
   * { box-sizing:border-box; }
@@ -78,6 +78,116 @@
   .toast.show { transform:translateX(-50%) translateY(0); }
   .toast.err { border-color:var(--red); }
   .info-text { color:var(--sub); font-size:14px; line-height:1.5; }
+  .wrap:has(.tension-studio) { max-width:1080px; }
+  .wrap:has(.tension-studio) .actions { flex-wrap:wrap; }
+  .tension-studio { padding:24px; }
+  .tension-studio h2 { font-size:26px; margin:0 0 8px; }
+  .tension-studio h3 { font-size:18px; margin:0; }
+  .tension-intro { font-size:14px; color:#b9c2d0; line-height:1.6; max-width:680px; }
+  .tension-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; margin-top:24px; }
+  .tension-card { min-width:0; padding:20px; background:#121720; border:1px solid #364151; border-radius:14px; }
+  .tension-heading { display:flex; gap:12px; align-items:center; margin-bottom:18px; }
+  .tension-badge { padding:10px; background:#203650; border:1px solid #4878a9; border-radius:10px; font-weight:700; }
+  .tension-help { color:#b9c2d0; font-size:13px; line-height:1.5; margin:6px 0 10px; }
+  .tension-control { margin:20px 0; }
+  .tension-control label { font-size:14px; font-weight:600; }
+  .tension-label { display:flex; justify-content:space-between; align-items:baseline; gap:8px; }
+  .tension-label output { font-size:13px; color:#9dcbff; font-variant-numeric:tabular-nums; }
+  .tension-control input[type=range] { display:block; width:100%; min-height:36px; margin:0; accent-color:#79bcff; cursor:pointer; }
+  .tension-control select { width:100%; text-align:left; min-height:44px; }
+  .tension-ends { display:flex; justify-content:space-between; color:#b9c2d0; font-size:12px; }
+  .tension-graph { width:100%; display:block; background:#0f131a; border:1px solid #364151; border-radius:10px; }
+  .tension-graph text { fill:#b9c2d0; font:11px system-ui; }
+  .tension-warning { color:#ffd084; font-size:13px; line-height:1.5; }
+  .tension-warning:empty { display:none; }
+  .tension-card details { border-top:1px solid #364151; padding:12px 0; }
+  .tension-card summary { cursor:pointer; padding:8px 0; font-size:14px; font-weight:600; min-height:40px; }
+  .tension-card .row { flex-wrap:wrap; gap:8px; align-items:flex-start; }
+  .tension-card .row .label { font-size:13px; }
+  .tension-card .row select { max-width:100%; width:100%; }
+  .tension-card .row > div { min-width:0; width:100%; }
+  .tension-card .desc { display:none; }
+  .tension-studio :focus-visible { outline:3px solid #a9d3ff; outline-offset:4px; }
+  .tension-studio [hidden] { display:none !important; }
+  @media (max-width:760px) { .tension-grid { grid-template-columns:1fr; } .tension-studio { padding:16px; } body { padding:12px; } }
+
+  .wrap { max-width:1080px; }
+  .actions { flex-wrap:wrap; margin-bottom:20px; }
+  .page-intro { padding:18px 4px 24px; }
+  .page-eyebrow { font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:#9dcbff; font-weight:600; }
+  .page-intro h2 { font-size:30px; margin:8px 0; letter-spacing:-.6px; }
+  .page-intro > p { color:#b9c2d0; line-height:1.6; max-width:730px; }
+  .studio-section { padding:24px; }
+  .studio-section > .card-title { margin:0 0 18px; font-size:14px; color:#c3cfdf; }
+  .setting-group + .setting-group { border-top:1px solid #364151; margin-top:20px; padding-top:20px; }
+  .setting-group h3 { margin:0; font-size:19px; }
+  .setting-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 32px; }
+  .setting { min-width:0; padding:18px 0; }
+  .setting > label, .setting-label label, .setting-bits legend { font-size:14px; font-weight:600; }
+  .setting-label { display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
+  .setting-label output { color:#9dcbff; font-size:13px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .setting-help { color:#b9c2d0; font-size:13px; line-height:1.55; margin:7px 0 12px; }
+  .setting select { width:100%; min-height:44px; text-align:left; }
+  .setting input[type=range] { width:100%; display:block; min-height:36px; margin:0; accent-color:#79bcff; cursor:pointer; }
+  .setting-ends { display:flex; justify-content:space-between; color:#b9c2d0; font-size:12px; gap:10px; }
+  .setting-switch { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:36px; cursor:pointer; }
+  .setting input[type=checkbox] { width:22px; height:22px; accent-color:#79bcff; cursor:pointer; flex-shrink:0; }
+  .setting-bits { border:0; padding:0; margin:0; }
+  .setting-bits label { display:inline-flex; align-items:center; gap:8px; margin-right:16px; min-height:44px; }
+  .setting-warning { color:#ffd084; font-size:13px; line-height:1.5; }
+  .setting-warning:empty { display:none; }
+  .exact-setting { margin-top:8px; }
+  .exact-setting summary { color:#b9c2d0; font-size:12px; cursor:pointer; padding:7px 0; }
+  .exact-setting label { display:block; font-size:12px; margin:6px 0; }
+  .exact-setting input { width:100%; text-align:left; }
+  .setting-group > summary, .studio-section > summary { min-height:44px; padding:8px 0; cursor:pointer; font-weight:600; font-size:17px; }
+  :focus-visible { outline:3px solid #a9d3ff; outline-offset:4px; }
+  .searchwrap input[type=search]:focus-visible { outline:3px solid #a9d3ff; }
+  .preview-heading { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .preview-heading h3 { margin:0; font-size:17px; }
+  .preview-heading > span { color:#9dcbff; font-size:13px; }
+  .mix-preview { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin-top:18px; }
+  .mix-preview .setting-label { font-size:13px; }
+  .mix-track { height:10px; background:#303a49; border-radius:12px; margin-top:10px; overflow:hidden; }
+  .mix-track span { display:block; height:100%; background:#79bcff; border-radius:12px; }
+  .response-preview { max-width:420px; width:100%; margin-top:16px; background:#10151e; border:1px solid #364151; border-radius:10px; }
+  .response-preview text { fill:#b9c2d0; font:11px system-ui; }
+  .workflow-steps { display:flex; gap:16px; counter-reset:step; list-style:none; padding:0; margin:24px 0 0; }
+  .workflow-steps li { flex:1; counter-increment:step; background:#1a2331; border:1px solid #364151; border-radius:10px; padding:16px; font-size:14px; line-height:1.5; }
+  .workflow-steps li::before { content:counter(step); display:inline-flex; align-items:center; justify-content:center; background:#294d76; color:#e6f1ff; border-radius:50%; width:26px; height:26px; margin-right:10px; font-weight:700; }
+  .slot-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+  .slot-card { background:#121720; border:1px solid #364151; border-radius:12px; padding:20px; min-width:0; }
+  .slot-card h3 { font-size:13px; color:#9dcbff; margin:0 0 10px; }
+  .slot-name { font-size:18px; margin-bottom:18px; overflow-wrap:anywhere; }
+  .slot-actions { display:flex; flex-wrap:wrap; gap:10px; }
+  .slot-backup { display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding-top:20px; margin-top:20px; border-top:1px solid #364151; }
+  .battery-stage { padding:18px; border:1px solid #364151; border-radius:10px; background:#121720; margin-top:12px; }
+  .battery-stage input[type=color] { min-width:56px; min-height:44px; }
+  #macrobox { grid-column:1 / -1; min-width:0; }
+  #macrobox table { display:block; overflow-x:auto; max-width:100%; padding-bottom:12px; }
+  #macrobox td { padding-top:10px !important; padding-bottom:10px !important; }
+  #macrobox input[type=text] { color:var(--text); background:#11141a; border:1px solid #364151; border-radius:6px; min-height:40px; }
+  #macrobox .btn, #slotbox .btn { min-height:40px; }
+  #macrobox > div { flex-wrap:wrap; }
+  .tab { min-height:40px; }
+  .btn:disabled { opacity:.5; cursor:default; }
+  @media(max-width:760px) { .setting-grid,.mix-preview,.slot-grid { grid-template-columns:1fr; } .workflow-steps { flex-direction:column; } .studio-section { padding:16px; } .page-intro h2 { font-size:26px; } body { padding:12px; } .card { min-width:0; } }
+
+
+  .toast:not(.show) { visibility:hidden; }
+  .macro-card { border:1px solid #364151; border-radius:12px; background:#121720; padding:20px; margin:16px 0; }
+  .macro-card-heading { display:flex; align-items:center; gap:14px; }
+  .macro-name { flex:1; min-width:0; }
+  .macro-name label { display:block; font-size:12px; color:#b9c2d0; margin-bottom:6px; }
+  #macrobox .macro-name input[type=text] { width:100% !important; padding:8px 10px !important; font-size:14px !important; }
+  .macro-flow { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; padding:20px 0; }
+  .macro-flow h3 { margin:0 0 12px; font-size:15px; color:#9dcbff; }
+  .macro-flow p { font-size:14px; overflow-wrap:anywhere; }
+  .macro-buttons { display:flex; gap:8px; flex-wrap:wrap; }
+  .macro-options { border-top:1px solid #364151; padding-top:14px; font-size:13px; line-height:2; }
+  .macro-options select { max-width:100%; }
+  @media(max-width:760px) { .macro-flow { grid-template-columns:1fr; gap:8px; } .macro-card { padding:14px; } }
+
 </style>
 </head>
 <body>
@@ -723,22 +833,21 @@ async function _refreshSlotsOnce(){
       if (_slotHealTries++ < 8) setTimeout(() => refreshSlots(), 1500);
       return;
     }
-    const label = info && info.valid ? `<b>${info.name || '(unnamed)'}</b>` : '<span style="color:var(--sub)">empty</span>';
-    rows += `<div style="display:flex;gap:8px;align-items:center;margin:4px 0">
-      <span style="width:52px;color:var(--sub)">Slot ${i+1}</span>
-      <span style="flex:1">${label}</span>
-      <button class="btn btn-outline" style="padding:2px 10px" onclick="uiSlotSave(${i})">Save current</button>
-      <button class="btn btn-outline" style="padding:2px 10px" ${info && info.valid ? '' : 'disabled'} onclick="uiSlotActivate(${i})">Activate</button>
-    </div>`;
+    const label = info && info.valid ? escAttr(info.name || '(unnamed)') : 'Empty slot';
+    rows += `<section class="slot-card" aria-labelledby="slot_title_${i}">
+      <h3 id="slot_title_${i}">Slot ${i+1}</h3><div class="slot-name">${label}</div>
+      <div class="slot-actions"><button class="btn btn-outline" aria-label="Save current configuration to slot ${i+1}" onclick="uiSlotSave(${i})">Save current</button>
+      <button class="btn btn-outline" ${info && info.valid ? '' : 'disabled'} aria-label="Activate slot ${i+1}" onclick="uiSlotActivate(${i})">Activate</button></div>
+    </section>`;
   }
-  const boxNow = document.getElementById('slotbox'); // render() may have replaced the node mid-run
-  if (boxNow) boxNow.innerHTML = rows +
-    `<div style="display:flex;gap:8px;align-items:center;margin:10px 0 2px;padding-top:8px;border-top:1px solid var(--line,#333)">
-       <button class="btn btn-outline" style="padding:2px 10px" onclick="backupAllSlots()">Back up all slots</button>
-       <button class="btn btn-outline" style="padding:2px 10px" onclick="document.getElementById('restoreFile').click()">Restore from file</button>
+  const boxNow = document.getElementById('slotbox');
+  if (boxNow) boxNow.innerHTML = `<div class="slot-grid">${rows}</div>` +
+    `<div class="slot-backup">
+       <button class="btn btn-outline" onclick="backupAllSlots()">Back up all slots</button>
+       <button class="btn btn-outline" onclick="document.getElementById('restoreFile').click()">Restore from file</button>
        <input id="restoreFile" type="file" accept="application/json,.json" style="display:none"
               onchange="if(this.files[0]){restoreAllSlots(this.files[0]); this.value='';}">
-       <span id="backupStatus" style="flex:1;color:var(--sub);font-size:12px"></span>
+       <span id="backupStatus" role="status" style="flex:1;color:var(--sub);font-size:12px"></span>
      </div>`;
   _slotHealTries = 0; // full list rendered - reset the self-heal budget
 }
@@ -1724,19 +1833,19 @@ function battStagesHTML(){
     const on = (+config[kOn] || 0) === 1;
     const dis = on ? '' : ' disabled';
     const dirty = k => "(window._dirty=window._dirty||{})['" + k + "']=1";
-    h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 0;border-top:1px solid var(--line,#333)">';
-    h += '<label style="min-width:78px"><input type="checkbox"' + (on ? ' checked' : '') +
+    h += '<div class="battery-stage" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">';
+    h += '<label style="min-width:78px"><input id="battery_on_' + i + '" type="checkbox"' + (on ? ' checked' : '') +
          ' onchange="config[\'' + kOn + '\']=this.checked?1:0;' + dirty(kOn) + ';render()"> Stage ' + (i+1) + '</label>';
     h += '<span style="font-size:12px;color:var(--sub)">at</span>';
-    h += '<select' + dis + ' onchange="config[\'' + kLv + '\']=+this.value;' + dirty(kLv) + '">';
+    h += '<select id="battery_level_' + i + '" aria-label="Stage ' + (i+1) + ' battery threshold"' + dis + ' onchange="config[\'' + kLv + '\']=+this.value;' + dirty(kLv) + '">';
     for (const [v,lab] of BATT_LEVELS)
       h += '<option value="' + v + '"' + ((+config[kLv] || 0) === v ? ' selected' : '') + '>' + lab + '</option>';
     h += '</select>';
     h += '<span style="font-size:12px;color:var(--sub)">pulses</span>';
-    h += '<input type="number" min="1" max="20" style="width:64px" value="' + (+config[kBl] || 5) + '"' + dis +
+    h += '<input id="battery_pulses_' + i + '" aria-label="Stage ' + (i+1) + ' pulse count" type="number" min="1" max="20" style="width:64px" value="' + (+config[kBl] || 5) + '"' + dis +
          ' onchange="config[\'' + kBl + '\']=cfgClampNum(this,1,20,false);' + dirty(kBl) + '">';
     h += '<span style="font-size:12px;color:var(--sub)">colour</span>';
-    h += '<input type="color" style="width:46px;height:26px;padding:0;border:1px solid var(--line,#333);background:none" value="' +
+    h += '<input id="battery_color_' + i + '" aria-label="Stage ' + (i+1) + ' alert color" type="color" style="width:46px;height:26px;padding:0;border:1px solid var(--line,#333);background:none" value="' +
          battHex(i) + '"' + dis + ' onchange="battColour(' + i + ', this.value)">';
     // The picker writes three bytes at once, so the literals the harness needs
     // live here. Same device as the macro_disable hidden input above.
@@ -1744,7 +1853,7 @@ function battStagesHTML(){
     h += '<input type="hidden" oninput="config[\'' + kG + '\']=+this.value" value="' + (+config[kG]||0) + '">';
     h += '<input type="hidden" oninput="config[\'' + kB + '\']=+this.value" value="' + (+config[kB]||0) + '">';
     h += '<button class="btn btn-outline" style="padding:2px 10px"' + (device ? '' : ' disabled') +
-         ' onclick="battTest(' + i + ')">Test</button>';
+         ' aria-label="Test battery alert stage ' + (i+1) + '" onclick="battTest(' + i + ')">Test</button>';
     h += '</div>';
   }
   return h;
@@ -2960,7 +3069,7 @@ function audioBridgeHTML(){
     h += '<button class="btn btn-outline" style="padding:3px 12px" onclick="abListSinks()">List output devices</button>';
   } else {
     h += '<div style="margin-bottom:6px"><label style="font-size:12px;color:var(--sub)">Send to&nbsp;</label>' +
-         '<select id="abSink" onchange="abPickSink(this.value)" style="padding:2px 4px;font-size:12px;min-width:300px">';
+         '<select id="abSink" aria-label="Controller audio output" onchange="abPickSink(this.value)" style="padding:2px 4px;font-size:12px;min-width:0;max-width:100%;width:300px">';
     for (const d of abSinks){
       h += '<option value="' + escAttr(d.id) + '"' + (d.id === abSinkId ? ' selected' : '') + '>' +
            escAttr(d.label) + '</option>';
@@ -3577,7 +3686,7 @@ function macroOutBtnValues(){
 }
 function macroPickBtnHTML(i, m){ return macroPickOutHTML(i, m, macroOutBtnValues(), 'Which controller button should this macro send?'); }
 function macroPickOutHTML(i, m, values, prompt){
-  let h = '<div style="border:1px solid #06a;background:#001a2a;padding:8px;border-radius:6px;margin:6px 0">';
+  let h = '<div class="macro-picker" style="border:1px solid #06a;background:#001a2a;padding:8px;border-radius:6px;margin:6px 0">';
   h += '<div style="font-size:12px;color:var(--sub);margin-bottom:6px">' + prompt + '</div>';
   for (const k of values){
     const on = (m.out_btn|0) === k;
@@ -3629,7 +3738,7 @@ function macroPickInApply(){
 }
 function macroPickInHTML(i){
   const p = window._macroPickIn;
-  let h = '<div style="border:1px solid #06a;background:#001a2a;padding:8px;border-radius:6px;margin:6px 0">';
+  let h = '<div class="macro-picker" style="border:1px solid #06a;background:#001a2a;padding:8px;border-radius:6px;margin:6px 0">';
   h += '<div style="font-size:12px;color:var(--sub);margin-bottom:6px">Tick the buttons this macro should trigger on. Fn and paddle bits are DualSense Edge only, and only report when the controller is not already using them.</div>';
   for (const b of BTN){
     const on = (p.mask & b[1]) !== 0;
@@ -5026,6 +5135,9 @@ function macroOptionsRowHTML(i, m, isStick, dis){
 function macroRender(){
   const box = document.getElementById('macrobox');
   if (!box) return;
+  const macroFocusId = document.activeElement && document.activeElement.id;
+  const macroFocusAction = document.activeElement?.getAttribute?.('onclick') || '';
+  if (/^macroPick(?:In)?Open\(/.test(macroFocusAction)) window._macroReturnFocus = macroFocusId;
   const rows = window._macroRows;
   if (!rows){ box.textContent = device ? 'Reading macros…' : 'Connect a device to load macros.'; return; }
   const rec = window._macroRec;
@@ -5084,8 +5196,8 @@ function macroRender(){
     const recOut = rec && rec.row === i && rec.which === 1;
     const dis    = rec ? ' disabled' : '';
     h += '<tr style="border-top:1px solid var(--line,#333)">';
-    h += '<td><input type="checkbox" onchange="macroSetBit(' + i + ', this.checked)"' + (macroBit(i) ? ' checked' : '') + '></td>';
-    h += '<td style="padding:2px 6px"><input type="text" maxlength="15" placeholder="unnamed" ' +
+    h += '<td><input id="macro_enable_' + i + '" aria-label="Enable macro ' + (i+1) + '" type="checkbox" onchange="macroSetBit(' + i + ', this.checked)"' + (macroBit(i) ? ' checked' : '') + '></td>';
+    h += '<td style="padding:2px 6px"><input id="macro_name_' + i + '" aria-label="Macro ' + (i+1) + ' name" type="text" maxlength="15" placeholder="unnamed" ' +
          'style="width:104px;padding:2px 4px;font-size:12px" oninput="macroSetLabel(' + i + ', this.value)" ' +
          'value="' + escAttr(m.label || '') + '"></td>';
     const pickInOpen = pickIn && pickIn.row === i;
@@ -5117,7 +5229,7 @@ function macroRender(){
     }
     h += '</td>';
     h += '<td style="padding:2px 8px;color:' + (outTxt !== '—' ? 'inherit' : 'var(--sub)') + '">' + outTxt + '</td>';
-    h += '<td><button class="btn btn-outline" style="padding:2px 6px" onclick="macroDeleteRow(' + i + ')"' + dis + '>−</button></td>';
+    h += '<td><button class="btn btn-outline" style="padding:2px 6px" aria-label="Delete macro ' + (i+1) + '" onclick="macroDeleteRow(' + i + ')"' + dis + '>Delete</button></td>';
     h += '</tr>';
     h += macroOptionsRowHTML(i, m, isStick, dis);
     if (pickInOpen){
@@ -5155,7 +5267,7 @@ function macroRender(){
     h += '<div style="padding:10px 2px;color:var(--sub);font-size:12px">No macros yet — press + to add one.</div>';
   }
   h += '<div style="margin-top:8px;display:flex;gap:8px;align-items:center">';
-  h += '<button class="btn btn-outline" style="padding:2px 10px" onclick="macroAddRow()"' + (rec ? ' disabled' : '') + '>+</button>';
+  h += '<button class="btn btn-outline" style="padding:2px 10px" onclick="macroAddRow()"' + (rec ? ' disabled' : '') + '>Add macro</button>';
   h += '<button class="btn" style="padding:2px 10px" onclick="macroSaveTable()"' + (rec ? ' disabled' : '') + '>Save macros to device</button>';
   h += '<button class="btn btn-outline" style="padding:2px 10px" onclick="macroExportFile()"' + (rec ? ' disabled' : '') + '>Export macros</button>';
   h += '<button class="btn btn-outline" style="padding:2px 10px" onclick="macroImportPick()"' + (rec ? ' disabled' : '') + '>Import macros</button>';
@@ -5163,7 +5275,12 @@ function macroRender(){
   h += '</div>';
   h += macroMotionPanelHTML();
   h += macroLivePanelHTML();
-  box.innerHTML = h;
+  box.innerHTML = studioMacroHTML(studioMacroCardsHTML(h));
+  const target = macroFocusId && document.getElementById(macroFocusId);
+  if (target && !target.disabled) target.focus();
+  else if ((pick || pickIn) && typeof box.querySelector === 'function') {
+    box.querySelector('.macro-options select[onchange^="macroPickKey"], .macro-picker button:not([disabled])')?.focus();
+  } else if (window._macroReturnFocus) document.getElementById(window._macroReturnFocus)?.focus();
 }
 
 // Saves the WHOLE macro state: the shared table AND the enable mask.
@@ -5398,7 +5515,7 @@ function searchBarHTML(q, groups){
              : n  ? `${n} match${n===1?'':'es'} in ${tabs.size} tab${tabs.size===1?'':'s'}`
                   : 'no matches';
   return `<div class="searchwrap">
-      <input type="search" id="qbox" value="${escAttr(q)}" autocomplete="off" spellcheck="false"
+      <input type="search" id="qbox" aria-label="Find a setting" value="${escAttr(q)}" autocomplete="off" spellcheck="false"
              placeholder="Find a setting — its name, or a word for what it does"
              oninput="setSearch(this.value)" onkeydown="searchKey(event)">
       <span class="hits">${hits}</span>` +
@@ -5544,84 +5661,227 @@ const SUB_DIVIDERS = {
 
 // One settings row. Extracted from render() so the side-by-side trigger view can
 // place identical markup into grid cells without duplicating any of it.
-function fieldRowHTML(f){
-  const [fid,key,type,label,kind,opts] = f;
-  // The battery STAGE settings are stored as ordinary config fields so save,
-  // load, profiles and slot backups all carry them for free - but a level, a
-  // count, a colour and an on/off switch read as one thing, not five rows of
-  // numbers. They are drawn by battStagesHTML() as a row per stage with a real
-  // colour picker. The card still references config['...'] for each of them, so
-  // the render harness sees every field as reachable.
-  if (/^batt_stage_/.test(key)) return '';
-  let html = '';
-  const _d = SUB_DIVIDERS[key];
-  if (_d) html += `<div class="${_d.bold ? 'subdiv' : 'subdiv-light'}">${_d.label}</div>`;
-  html += `<div class="row"><div><div class="label">${label}${descMarker(key)}</div></div><div>`;
-  if(kind==='macros'){
-    html += `<div style="text-align:right;font-size:12px;color:var(--sub)">edited below</div>`;
-    html += `</div></div><div id="macrobox">Connect a device to load macros.</div>`;
-    // Hidden mirror so saveAll()'s FIELDS walk writes the bitmap like any other
-    // field; the checkboxes drive it via macroBit().
-    // Bound the same way every other field is, so the render harness sees it and
-    // saveAll()'s FIELDS walk picks it up. Value is numeric - no quoted data goes
-    // into the attribute.
-    html += `<input type="hidden" id="f_macro_disable" oninput="config['macro_disable']=+this.value" value="${(+config['macro_disable']>>>0)}">`;
-    return html;
+// Shared setting controls: all edits still use the same firmware keys and save loop.
+const STUDIO_PAGES = {
+  device:['Make the controller yours','Connection, battery alerts, touchpad and steering — organized around how you use the controller.'],
+  haptics:['Shape the feedback','Balance game haptics, audio-derived rumble and controller sound. Start with the feel, then refine the filters.'],
+  gyro:['Find your aim','Choose how motion and sticks move the view, then tune sensitivity and the response curve.'],
+  macros:['Build a shortcut','Give a controller input a keyboard, mouse or controller action. Record it, refine it, then save it.'],
+  slots:['Keep a setup for every game','Store the current configuration in a slot. Activate a saved slot when you want that setup back.'],
+};
+function studioMacroHTML(html){
+  const used=new Map();
+  return html.replace(/<(input|select|button)\b([^>]*?)>/g,(tag,kind,attrs)=>{
+    const handler=attrs.match(/\son(?:change|input|click)="([^"]+)"/);
+    if(!handler)return tag;
+    const action=handler[1], fn=action.match(/^(\w+)\(/)?.[1];
+    const args=action.match(/\((\d+)(?:,(\d+))?/);
+    const row=args?Number(args[1])+1:null;
+    if(!/\sid=/.test(attrs)){
+      const stableAction=fn==='macroPickInToggle'?fn+'_'+args?.[1]:action;
+      const base='mc_'+stableAction.replace(/[^a-zA-Z0-9_]/g,'_');
+      const count=used.get(base)||0;used.set(base,count+1);
+      attrs+=` id="${base}_${count}"`;
+    }
+    const names={macroSetStick:'Input type',macroSetOutKind:'Output type',macroPickKey:'Keyboard output key',macroSetStickThresh:'Stick activation threshold',macroMotionStepSet:'Motion step threshold'};
+    let name=names[fn];
+    if(fn==='macroSetStickKey')name=STICK_DIRS[Number(args?.[2]||0)]+' output key';
+    if(fn==='macroPickInOpen')name='Pick controller input';
+    if(fn==='macroPickOpen')name='Pick output action';
+    if(fn==='macroMotionClear')name='Clear motion template';
+    if(fn==='macroPickInToggle')attrs+=` aria-pressed="${/false/.test(action)}"`;
+    if(name && !/\saria-label=/.test(attrs))attrs+=` aria-label="${row && fn!=='macroMotionStepSet' && fn!=='macroPickKey'?'Macro '+row+' — ':''}${name}"`;
+    return `<${kind}${attrs}>`;
+  });
+}
+function studioMacroCardsHTML(html){
+  // Preserve the editor's actions while keeping input/output pairs together.
+  return html.replace(/<table[^>]*>([\s\S]*?)<\/table>/,(table,body)=>{
+    const cards=[];
+    const rows=/<tr style="border-top:[^"]*">([\s\S]*?)<\/tr>([\s\S]*?)(?=<tr style="border-top:|$)/g;
+    for(const m of body.matchAll(rows)){
+      const cells=[...m[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map(c=>c[1]);
+      if(cells.length!==7)return table;
+      const options=m[2].replace(/<\/?tr[^>]*>|<\/?td[^>]*>/g,'');
+      const nameId=cells[1].match(/id="([^"]+)"/)?.[1];
+      const number=Number(cells[0].match(/id="macro_enable_(\d+)"/)?.[1] ?? cards.length)+1;
+      cards.push(`<section class="macro-card" aria-label="Macro ${number}">
+        <div class="macro-card-heading"><div>${cells[0]}</div><div class="macro-name"><label for="${nameId}">Name</label>${cells[1]}</div><div>${cells[6]}</div></div>
+        <div class="macro-flow"><div><h3>When I press…</h3><div class="macro-buttons">${cells[2]}</div><p>${cells[3]}</p></div><div><h3>Send this action</h3><div class="macro-buttons">${cells[4]}</div><p>${cells[5]}</p></div></div>
+        <div class="macro-options">${options}</div></section>`);
+    }
+    return `<div class="macro-list">${cards.join('')}</div>`;
+  });
+}
+const STUDIO_GROUPS = {
+  'Auto-Haptics & Speaker Effect Leak':[
+    ['The feel','Strength, texture and the mix with a game’s own feedback.', ['auto_haptics_enable','auto_haptics_gain','auto_haptics_smooth','auto_haptics_gate','mix_native_level','rumble_haptic_strength']],
+    ['Frequency shaping','Separate deep impacts from higher-frequency texture.', ['auto_haptics_lowpass_hz','ah_xover_hz','ah_low_gain','ah_high_gain','auto_haptics_slope'],true],
+    ['Audio routing','Choose the input feed and how native feedback passes through.', ['mix_native_filter','ah_dsp_source','auto_mute_replace','auto_mute_mix'],true],
+    ['Controller speaker accents','Let short impacts through the speaker. Volume zero switches this effect off.', ['effect_leak_volume','effect_leak_sensitivity','effect_leak_decay','effect_leak_attack']],
+    ['Speaker accent filters','Refine the detection band, output window and burst timing.', ['effect_leak_output_hp_hz','effect_leak_hp_hz','effect_leak_lp_hz','effect_leak_max_burst','effect_leak_hold'],true],
+  ],
+  'General Haptics & Audio':[
+    ['Volume & strength','Adjust controller and headset levels.', ['haptics_gain','speaker_volume','headset_volume','speaker_gain']],
+    ['Audio behavior','Keep levels consistent or silence a device.', ['sync_spk_headset_volume','lock_volume','disable_mic','disable_speaker'],true],
+  ],
+  'Device & Connection':[
+    ['Connection','Controller identity, update rate and audio buffering.', ['controller_mode','polling_rate_mode','audio_buffer_length']],
+    ['Power & lights','Idle behavior, wake-up and controller indicators.', ['inactive_time','disable_inactive_disconnect','enable_wake','disable_pico_led','lightbar_off','player_led_mode','player_led_bright']],
+  ],
+  'Gyro Aiming':[
+    ['Motion & activation','Choose when aiming is active and where motion is sent.', ['gyro_mode','gyro_output','gyro_axis','gyro_invert']],
+    ['Sensitivity','Manual sensitivity tunes by feel; Natural uses a real-world rotation ratio.', ['gyro_sens_mode','gyro_sens','gyro_sens_y','gyro_natural_x10','gyro_natural_y_x10']],
+    ['Flick Stick & calibration','Calibrate mouse counts for your game before using Natural sensitivity or Flick Stick.', ['flick_angle','flick_counts_360','gyro_scale_trim_x100'],true],
+  ],
+};
+const STUDIO_LABELS = {
+  auto_haptics_gain:'Audio-derived intensity',auto_haptics_smooth:'Smoothness',auto_haptics_gate:'Quiet-audio threshold',
+  mix_native_level:'Native feedback in the mix',rumble_haptic_strength:'Converted rumble intensity',
+  auto_haptics_lowpass_hz:'Haptic frequency ceiling',ah_xover_hz:'Low / high band split',
+  ah_low_gain:'Deep-impact strength',ah_high_gain:'Higher-frequency texture',
+  effect_leak_volume:'Speaker accent volume',effect_leak_max_burst:'Maximum accent duration',effect_leak_hold:'Accent gate hold',
+  gyro_natural_x10:'Natural horizontal multiplier',gyro_natural_y_x10:'Natural vertical multiplier',
+  stick_mouse_curve:'Stick response curve',stick_mouse_sens:'Horizontal pointer speed',stick_mouse_sens_y:'Vertical pointer speed',
+  gyro_scale_trim_x100:'Sensor scale correction',flick_counts_360:'Mouse counts for a full turn',
+};
+function studioFormat(f, n){
+  const key=f[1];
+  if ((key==='gyro_sens_y'||key==='gyro_natural_y_x10'||key==='stick_mouse_sens_y') && n===0) return 'Match horizontal';
+  if (key==='stick_mouse_sens' && n===0) return 'Default · 600 counts/s';
+  if (key==='ah_xover_hz' && n===0) return 'Off';
+  if (key==='effect_leak_max_burst') return n===0?'Unlimited':n*5+' ms';
+  if (key==='effect_leak_hold') return n*5+' ms';
+  if (/gyro_natural.*x10|stick_mouse_curve/.test(key)) return (n/10).toFixed(1)+'×';
+  if (key==='gyro_scale_trim_x100') return (n/100).toFixed(2)+'×';
+  if (key==='haptics_gain') return Number(n).toFixed(2)+'×';
+  if (/hz$/.test(key)) return n+' Hz';
+  if (key==='inactive_time') return n+' min';
+  if (/tilt.*range|tilt.*deadzone|flick_angle/.test(key)) return n+'°';
+  if (/stick_mouse_sens/.test(key)) return n+' counts/s';
+  if (/gain|strength|volume|amount|mix_native_level|stick_mouse_deadzone/.test(key) && f[5][1]===100 || /auto_haptics_gain|rumble_haptic_strength/.test(key)) return n+'%';
+  if (/volume/.test(key)) return n+' / '+f[5][1];
+  return String(n);
+}
+function studioSet(key, value){
+  const f=FIELDS.find(f=>f[1]===key);
+  if (!f) return;
+  let n=Number(value);
+  if (!Number.isFinite(n)) return;
+  if(f[4]==='number'){
+    const [min,max]=f[5];
+    n=Math.max(min,Math.min(max,n));
+    n=f[2]==='f32'? Math.round(n*20)/20 : Math.round(n);
   }
-  if(kind==='bits'){
-    // One checkbox per bit of a bitmask byte (e.g. gyro/right-stick X & Y invert).
-    // Each toggles its own bit of config[key] and leaves the others untouched, so
-    // the single stored byte round-trips through the normal read/save loop.
-    const cur = +config[key] || 0;
-    html += `<div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:flex-end;align-items:center">`;
-    (opts||[]).forEach((lbl,i) => {
-      const mask = 1 << i;
-      html += `<label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:14px">`
-            + `<input type="checkbox" ${(cur&mask)?'checked':''} onchange="config['${key}']=((+config['${key}']||0)&~${mask})|(this.checked?${mask}:0);(window._dirty=window._dirty||{})['${key}']=1" style="width:auto;margin:0"> ${lbl}</label>`;
-    });
-    html += `</div>`;
-  } else if(kind==='bool'){
-    // Same reasoning as the select below: a field that drives an inline warning
-    // has to redraw, or the warning only appears after some other edit.
-    const reRenderB = ['touch_mouse'].includes(key);
-    html += `<select onchange="config['${key}']=+this.value;(window._dirty=window._dirty||{})['${key}']=1${reRenderB?';render()':''}">
-      <option value="0" ${config[key]==0?'selected':''}>No</option>
-      <option value="1" ${config[key]==1?'selected':''}>Yes</option></select>`;
+  config[key]=n;
+  (window._dirty=window._dirty||{})[key]=1;
+  studioRefresh(key);
+}
+function studioRefresh(key){
+  const f=FIELDS.find(f=>f[1]===key);
+  if(f?.[4]==='number'){
+    const n=config[key];
+    for(const id of ['sf_'+key,'sx_'+key]){
+      const input=document.getElementById(id);
+      if(input){input.value=n; if(input.type==='range') input.setAttribute('aria-valuetext',studioFormat(f,n));}
+    }
+    const out=document.getElementById('sv_'+key); if(out) out.textContent=studioFormat(f,n);
+  }
+  for(const warningKey of ['ce_r2_yield','ce_l2_yield','t2_button','t2_l2_button','touch_mouse','gyro_mode']){
+    const node=document.getElementById('sw_'+warningKey);
+    if(node) node.innerHTML=studioWarning(warningKey);
+  }
+  const diagram=document.getElementById('studio-preview');
+  if(diagram) diagram.innerHTML=studioPreviewHTML(window._tab||'triggers');
+  if(typeof tensionRefresh==='function') for(const side of ['L2','R2']) tensionRefresh(side);
+}
+function studioWarning(key){
+  if(/^ce_.*yield$/.test(key)) return ceGateWarning(key);
+  if(/^t2.*button$/.test(key)) return t2GateWarning(key);
+  if(key==='touch_mouse'||key==='gyro_mode') return touchGyroWarning();
+  return '';
+}
+function studioFieldHTML(f){
+  const [fid,key,type,label,kind,opts]=f;
+  const title=STUDIO_LABELS[key]||label;
+  const hint=DESCRIPTIONS[key]||'Adjust this setting, then choose Save to Device to apply it.';
+  const id='sf_'+key, help='sh_'+key;
+  let h=`<div class="setting" data-setting="${key}">`;
+  if(kind==='bool'){
+    h+=`<label class="setting-switch" for="${id}"><span>${title}</span><input id="${id}" type="checkbox" role="switch" ${config[key]==1?'checked':''} aria-describedby="${help}" onchange="studioSet('${key}',this.checked?1:0)"></label><p class="setting-help" id="${help}">${hint}</p>`;
+  } else if(kind==='bits'){
+    h+=`<fieldset class="setting-bits"><legend>${title}</legend><p class="setting-help" id="${help}">${hint}</p>`;
+    opts.forEach((text,i)=>{const mask=1<<i;
+      h+=`<label><input type="checkbox" aria-describedby="${help}" ${(+config[key]&mask)?'checked':''} onchange="config['${key}']=((+config['${key}']||0)&~${mask})|(this.checked?${mask}:0);(window._dirty=window._dirty||{})['${key}']=1"> ${text}</label>`;
+    }); h+='</fieldset>';
   } else if(kind==='select'){
-    // NOTE: never embed a JSON array here - its double quotes close the onchange
-    // attribute and silently break EVERY select in the portal. Decide the
-    // re-render here and emit only a bare call.
-    const reRender = ['ce_r2_yield','ce_l2_yield','at_mode','at_l2_mode','ce_r2_enable','ce_l2_enable','t2_button','t2_l2_button','gyro_mode'].includes(key);
-    html += `<select onchange="config['${key}']=+this.value;(window._dirty=window._dirty||{})['${key}']=1${reRender?';render()':''}">`;
-    { const pairs = Array.isArray(opts) ? opts : Object.entries(opts); for(const [v,lbl] of pairs) html += `<option value="${v}" ${config[key]==v?'selected':''}>${lbl}</option>`; }
-    html += `</select>`;
+    const pairs=Array.isArray(opts)?opts:Object.entries(opts);
+    h+=`<label for="${id}">${title}</label><p class="setting-help" id="${help}">${hint}</p><select id="${id}" aria-describedby="${help}" onchange="studioSet('${key}',this.value)">${pairs.map(([v,l])=>`<option value="${v}" ${config[key]==v?'selected':''}>${l}</option>`).join('')}</select>`;
   } else {
-    const [min,max]=opts;
-    const step = (type==='f32') ? '0.05' : '1';
-    const val = (config[key]??0);
-    const shown = (type==='f32') ? Number(val).toFixed(2) : val;
-    // CLAMP to the declared range. min/max on a number input only style the
-    // spinner - a typed value goes straight through, and writeField() then
-    // masks it to the field width. That silently turned a typed 2000 into 208
-    // (2000 & 0xFF) rather than the maximum, so the setting appeared to behave
-    // backwards. Clamp here and write the clamped value back into the box, so
-    // what is shown is what was sent.
-    html += `<input type="number" min="${min}" max="${max}" step="${step}" value="${shown}" onchange="config['${key}']=cfgClampNum(this, ${min}, ${max}, ${type === 'f32'});(window._dirty=window._dirty||{})['${key}']=1">`;
+    const [min,max]=opts, step=type==='f32'?0.05:1, value=config[key]??min;
+    h+=`<div class="setting-label"><label for="${id}">${title}</label><output id="sv_${key}" for="${id}">${studioFormat(f,value)}</output></div><p class="setting-help" id="${help}">${hint}</p>
+      <input id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${value}" aria-describedby="${help}" aria-valuetext="${studioFormat(f,value)}" oninput="studioSet('${key}',this.value)">
+      <div class="setting-ends" aria-hidden="true"><span>${studioFormat(f,min)}</span><span>${studioFormat(f,max)}</span></div>
+      <details class="exact-setting" id="se_${key}"><summary>Enter an exact value</summary><label for="sx_${key}">${title} — raw value</label><input type="number" id="sx_${key}" min="${min}" max="${max}" step="${step}" value="${value}" onchange="studioSet('${key}',this.value)"></details>`;
   }
-  html += `</div></div>`;
-  if(key === 'ce_r2_yield' || key === 'ce_l2_yield'){
-    const w = ceGateWarning(key);
-    if(w) html += `<div class="row" style="padding-top:0"><div></div><div style="font-size:11px;color:#e0a030;line-height:1.35">⚠ ${w}</div></div>`;
+  if(['ce_r2_yield','ce_l2_yield','t2_button','t2_l2_button','touch_mouse','gyro_mode'].includes(key)) h+=`<div class="setting-warning" id="sw_${key}" role="status">${studioWarning(key)}</div>`;
+  return h+'</div>';
+}
+function studioSectionHTML(section){
+  const groups=STUDIO_GROUPS[section.title];
+  const id='section_'+SECTIONS.indexOf(section);
+  const advanced=/experimental/.test(section.title);
+  let h=advanced?`<details class="card studio-section" id="${id}"><summary>${section.title}</summary>`:`<section class="card studio-section" aria-labelledby="${id}"><h2 class="card-title" id="${id}">${section.title}</h2>`;
+  if(groups){
+    for(const [title,hint,keys,folded] of groups){
+      const groupId=id+'_'+keys[0];
+      h+=folded?`<details class="setting-group" id="${groupId}"><summary>${title}</summary>`:`<div class="setting-group"><h3>${title}</h3>`;
+      h+=`<p class="setting-help">${hint}</p><div class="setting-grid">`;
+      for(const key of keys) h+=fieldRowHTML(section.fields.find(f=>f[1]===key));
+      h+='</div>'+(folded?'</details>':'</div>');
+    }
+  } else {
+    h+='<div class="setting-grid">';
+    for(const f of section.fields) h+=fieldRowHTML(f);
+    h+='</div>';
   }
-  if(key === 'touch_mouse' || key === 'gyro_mode'){
-    const w = touchGyroWarning();
-    if(w) html += `<div class="row" style="padding-top:0"><div></div><div style="font-size:11px;color:#e0a030;line-height:1.35">⚠ ${w}</div></div>`;
+  if(section.title==='Battery Notification') h+=battStagesPanelHTML();
+  if(section.title==='Tilt Steering (experimental)') h+='<p class="setting-help">Use Start live test on the Macros tab to watch the left-stick output while you tilt. Calibrate against your game’s steering dead zone.</p>';
+  return h+(advanced?'</details>':'</section>');
+}
+function studioPreviewHTML(tab){
+  if(tab==='haptics'){
+    const mode=+config.auto_haptics_enable||0;
+    const items=[['Audio-derived',mode?+config.auto_haptics_gain||0:0,200],['Native in Mix',mode===1?+config.mix_native_level||0:0,100],['Converted rumble in Mix',mode===1?+config.rumble_haptic_strength||0:0,200]];
+    return `<div class="preview-heading"><h3>Your feedback mix</h3><span>${['Audio-derived off','Mix with native','Audio-derived only'][mode]}</span></div><p class="setting-help">Configured strengths, not a live signal. Speaker accents are tuned separately.</p><div class="mix-preview">${items.map(([name,v,max])=>`<div><div class="setting-label"><span>${name}</span><b>${v}%</b></div><div class="mix-track" aria-hidden="true"><span style="width:${Math.max(0,Math.min(100,v/max*100))}%"></span></div></div>`).join('')}</div>`;
   }
-  if(key === 't2_button' || key === 't2_l2_button'){
-    const w = t2GateWarning(key);
-    if(w) html += `<div class="row" style="padding-top:0"><div></div><div style="font-size:11px;color:#e0a030;line-height:1.35">⚠ ${w}</div></div>`;
+  if(tab==='gyro'){
+    const dz=(+config.stick_mouse_deadzone||0)/100, exponent=(+config.stick_mouse_curve||10)/10;
+    let points='';for(let i=0;i<=40;i++){const x=i/40,y=x<=dz?0:Math.pow((x-dz)/(1-dz),exponent);points+=`${32+x*296},${110-y*80} `;}
+    return `<div class="preview-heading"><h3>Stick-to-mouse response</h3><span>${exponent.toFixed(1)}× curve · ${Math.round(dz*100)}% dead zone</span></div>
+      <svg class="response-preview" viewBox="0 0 360 144" role="img" aria-label="Stick response curve with ${Math.round(dz*100)} percent dead zone and exponent ${exponent.toFixed(1)}. Larger exponents make small movements slower."><path d="M32 30V110H328 M32 110L328 30" stroke="#394354" fill="none"/><polyline points="${points}" fill="none" stroke="#79bcff" stroke-width="3"/><text x="32" y="20">Pointer speed</text><text x="32" y="134">Stick centered</text><text x="328" y="134" text-anchor="end">Full tilt</text></svg><p class="setting-help">Illustrative normalized curve. ${+config.stick_mouse?'Stick-to-mouse is enabled.':'Stick-to-mouse is off; these settings are used when you enable it.'} Natural gyro ratio: ${((+config.gyro_natural_x10||10)/10).toFixed(1)}×.</p>`;
   }
-  return html;
+  return '';
+}
+function studioPageHTML(tab){
+  const page=STUDIO_PAGES[tab];if(!page)return '';
+  let h=`<section class="page-intro"><span class="page-eyebrow">${TABS.find(t=>t.id===tab).label}</span><h2>${page[0]}</h2><p>${page[1]}</p>`;
+  if(tab==='macros'||tab==='slots'){
+    const steps=tab==='macros'?['Add & name a macro','Record or pick input and output','Save macros to device']:['Tune or import a profile','Save current to a slot','Activate it when needed'];
+    h+=`<ol class="workflow-steps">${steps.map(s=>`<li>${s}</li>`).join('')}</ol>`;
+  } else h+='<p class="setting-help">Tab moves between controls. Arrow keys adjust sliders; Home and End select the limits. Exact values are available below each slider. Choose Save to Device to apply edits.</p>';
+  h+='</section>';
+  const preview=studioPreviewHTML(tab);
+  if(preview)h+=`<section class="card studio-preview" id="studio-preview">${preview}</section>`;
+  return h;
+}
+
+function fieldRowHTML(f){
+  const key=f[1];
+  if(/^batt_stage_/.test(key))return '';
+  if(f[4]==='macros')return `<div id="macrobox">Connect a device to load macros.</div>
+    <input type="hidden" id="f_macro_disable" oninput="config['macro_disable']=+this.value" value="${(+config['macro_disable']>>>0)}">`;
+  return studioFieldHTML(f);
 }
 
 // R2 and L2 side by side. The two lists are otherwise identical in content and
@@ -5634,35 +5894,142 @@ const R2_TITLE = 'Adaptive Triggers — R2 (right trigger)';
 const L2_TITLE = 'Adaptive Triggers — L2 (left trigger)';
 const SHARED_TRIGGER_KEYS = new Set(['at_pushback_src']);
 const trigLogical = k => k.replace('at_l2_','at_').replace('ce_l2_','ce_').replace('ce_r2_','ce_').replace('t2_l2_','t2_');
-function triggerPairHTML(){
-  const secOf = t => (SECTIONS.find(s => s.title === t) || {fields:[]}).fields;
-  const r2 = secOf(R2_TITLE), l2 = secOf(L2_TITLE);
-  const shared = [...r2, ...l2].filter(f => SHARED_TRIGGER_KEYS.has(f[1]));
-  const l2map = new Map(l2.filter(f => !SHARED_TRIGGER_KEYS.has(f[1]))
-                          .map(f => [trigLogical(f[1]), f]));
-  const rows = [];
-  for(const f of r2){
-    if(SHARED_TRIGGER_KEYS.has(f[1])) continue;
-    const lk = trigLogical(f[1]);
-    rows.push([f, l2map.get(lk) || null]);
-    l2map.delete(lk);
-  }
-  for(const f of l2map.values()) rows.push([null, f]);   // any L2-only field
-  let h = `<div class="card"><div class="card-title">Adaptive Triggers</div>
-    <div class="tpair">
-      <div class="tcolhead">L2 — left trigger</div>
-      <div class="tcolhead">R2 — right trigger</div>`;
-  // L2 first: the columns mirror the controller, where L2 is the left trigger.
-  for(const [a,b] of rows)
-    h += `<div class="tcell">${b ? fieldRowHTML(b) : ''}</div><div class="tcell">${a ? fieldRowHTML(a) : ''}</div>`;
-  h += `</div>`;
-  if(shared.length){
-    h += `<div class="tshared"><div style="font-size:11px;color:var(--sub);margin-bottom:2px">Shared by both triggers</div>`;
-    for(const f of shared) h += fieldRowHTML(f);
-    h += `</div>`;
-  }
-  return h + `</div>`;
+// Native sliders keep pointer, touch, keyboard and assistive technology on the
+// same input path. Only config and the dirty map are edited; saving stays explicit.
+function tensionKey(side, suffix){ return side === 'L2' ? 'at_l2_' + suffix : 'at_' + suffix; }
+function tensionValue(key){ return Number(config[key] ?? 0); }
+function tensionSet(key, value){
+  const field = FIELDS.find(f => f[1] === key);
+  if (!field) return;
+  const bounds = field[4] === 'number' ? field[5] : null;
+  let n = Number(value);
+  if (!Number.isFinite(n)) return;
+  if (bounds) n = Math.max(bounds[0], Math.min(bounds[1], Math.round(n)));
+  config[key] = n;
+  (window._dirty = window._dirty || {})[key] = 1;
+  if (key === 'at_mode' || key === 'at_l2_mode') { tensionRerender(); return; }
+  for (const side of ['L2','R2']) tensionRefresh(side);
 }
+function tensionRerender(){
+  const focusId = document.activeElement && document.activeElement.id;
+  const expanded = [...document.querySelectorAll('.tension-card details')].map(d => d.open);
+  render();
+  document.querySelectorAll('.tension-card details').forEach((d,i) => { d.open = !!expanded[i]; });
+  if (focusId) document.getElementById(focusId)?.focus();
+}
+function tensionFormat(key, value){
+  if (/strength|pushback$/.test(key)) return value + '%';
+  if (/start_pos|detent_pos|deadzone/.test(key)) return 'Zone ' + value + ' of 9';
+  if (/threshold|^t2.*pos$/.test(key)) return value + ' / 255';
+  if (/freq/.test(key)) return value + ' Hz';
+  return String(value);
+}
+function tensionSlider(key, label, hint, ends){
+  const f = FIELDS.find(f => f[1] === key), [min,max] = f[5];
+  const value = config[key] ?? min;
+  return `<div class="tension-control" data-tension-key="${key}">
+    <div class="tension-label"><label for="te_${key}">${label}</label><output for="te_${key}" id="tv_${key}">${tensionFormat(key,value)}</output></div>
+    <p class="tension-help" id="th_${key}">${hint}</p>
+    <input id="te_${key}" type="range" min="${min}" max="${max}" step="1" value="${value}"
+      aria-describedby="th_${key}" aria-valuetext="${tensionFormat(key,value)}"
+      oninput="tensionSet('${key}',this.value)">
+    <div class="tension-ends" aria-hidden="true"><span>${ends[0]}</span><span>${ends[1]}</span></div>
+  </div>`;
+}
+function tensionSelect(key, label, hint){
+  const f = FIELDS.find(f => f[1] === key);
+  const pairs = Array.isArray(f[5]) ? f[5] : Object.entries(f[5]);
+  return `<div class="tension-control"><label for="te_${key}">${label}</label>
+    <p class="tension-help" id="th_${key}">${hint}</p>
+    <select id="te_${key}" aria-describedby="th_${key}" onchange="tensionSet('${key}',this.value)">
+      ${pairs.map(([v,l]) => `<option value="${v}" ${config[key]==v?'selected':''}>${l}</option>`).join('')}</select></div>`;
+}
+function tensionDiagram(side){
+  const k = suffix => tensionKey(side,suffix);
+  const a = tensionValue(k('strength')), b = tensionValue(k('strength_b'));
+  const start = tensionValue(k('start_pos')), point = tensionValue(k('detent_pos'));
+  const shape = tensionValue(k('shape')), mode = tensionValue(k('mode'));
+  const x = zone => 32 + zone / 9 * 296, y = strength => 108 - strength * .78;
+  let points = `32,108 ${x(start)},108 ${x(start)},${y(a)}`;
+  if (!mode) points = '32,108 328,108';
+  else if (shape === 1) points += ` 328,${y(b)}`;
+  else if (shape === 2) {
+    const p = Math.max(start,point);
+    points += ` ${x(p)},${y(a)} ${x(p)},${y(b)} ${Math.min(328,x(p)+16)},${y(b)} ${Math.min(328,x(p)+16)},${y(a)} 328,${y(a)}`;
+  } else if (shape === 3) {
+    const p = Math.min(8,Math.max(3,start+1,point));
+    points += ` ${x(p)},${y(a)} ${x(p)},108 328,108`;
+  } else points += ` 328,${y(a)}`;
+  const names = ['Constant resistance','Progressive ramp','Two-stage detent','Weapon break'];
+  const description = !mode ? `${side} resistance is off.` : `${side}: ${names[shape] || names[0]}, ${a}% initial tension, starting at zone ${start}.` +
+    (shape === 1 ? ` Ends at ${b}%.` : shape === 2 ? ` Detent at zone ${point}, ${b}% wall tension.` : shape === 3 ? ` Requested break at zone ${point}; hardware limits apply.` : '') +
+    (mode !== 2 ? ' Active only while the selected gate is held.' : ' Always active.');
+  return `<svg viewBox="0 0 360 140" role="img" aria-labelledby="td_${side}" class="tension-graph">
+    <title id="td_${side}">${description}</title>
+    <path d="M32 30H328 M32 69H328 M32 108H328" stroke="#394354" fill="none"/>
+    <text x="32" y="20">More tension</text>
+    <polygon points="${points} 328,108 32,108" fill="#4ea1ff" opacity=".16"/>
+    <polyline points="${points}" stroke="#79bcff" stroke-width="3" fill="none" stroke-linejoin="round"/>
+    <text x="32" y="130">Released</text><text x="328" y="130" text-anchor="end">Fully pulled</text>
+  </svg><p class="tension-help">${description}</p>`;
+}
+function tensionRefresh(side){
+  const root = document.getElementById('tension_' + side);
+  if (!root) return;
+  const k = suffix => tensionKey(side,suffix);
+  const shape = tensionValue(k('shape')), mode = tensionValue(k('mode'));
+  root.querySelector('[data-tension-diagram]').innerHTML = tensionDiagram(side);
+  root.querySelectorAll('[data-tension-key]').forEach(row => {
+    const key = row.dataset.tensionKey, input = row.querySelector('input');
+    const value = config[key] ?? input.min;
+    input.value = value;
+    input.setAttribute('aria-valuetext', tensionFormat(key,value));
+    row.querySelector('output').textContent = tensionFormat(key,value);
+  });
+  root.querySelector('[data-end-strength]').hidden = shape !== 1 && shape !== 2;
+  root.querySelector('[data-break-point]').hidden = shape !== 2 && shape !== 3;
+  root.querySelector('[data-gate-threshold]').hidden = mode !== 1;
+  const warn = root.querySelector('[data-tension-warning]');
+  warn.textContent = tensionValue(side === 'L2' ? 'ce_l2_enable' : 'ce_r2_enable') ?
+    'A captured effect is enabled. Its ownership setting below determines when this tension is used.' :
+    shape === 3 ? 'Weapon break uses hardware snap-through. The break is limited to zones 3–8 and forced above the start zone.' : '';
+}
+function tensionCardHTML(side){
+  const k = suffix => tensionKey(side,suffix);
+  const fields = SECTIONS.find(s => s.title === (side === 'L2' ? L2_TITLE : R2_TITLE)).fields;
+  const core = new Set(['mode','strength','threshold','start_pos','shape','strength_b','detent_pos'].map(k));
+  const recoil = fields.filter(f => /pushback|kick_style/.test(f[1]) && !SHARED_TRIGGER_KEYS.has(f[1]));
+  const remaining = fields.filter(f => !core.has(f[1]) && !recoil.includes(f) && !SHARED_TRIGGER_KEYS.has(f[1]));
+  const shape = tensionValue(k('shape')), mode = tensionValue(k('mode'));
+  return `<section class="tension-card" id="tension_${side}" aria-labelledby="tt_${side}">
+    <div class="tension-heading"><span class="tension-badge">${side}</span><div><h3 id="tt_${side}">${side === 'L2' ? 'Left' : 'Right'} trigger</h3><p class="tension-help">Shape how the pull feels.</p></div></div>
+    ${tensionSelect(k('mode'),'When resistance is active','Always on applies throughout play. Gated modes wait for the opposite trigger or shoulder button.')}
+    ${tensionSelect(k('shape'),'How the tension feels','Constant stays steady. Ramp changes gradually. Detent adds a wall. Weapon break snaps through.')}
+    <div data-tension-diagram>${tensionDiagram(side)}</div>
+    <p class="tension-help">Illustrative pull diagram; motor response and game effects can change the feel.</p>
+    ${tensionSlider(k('strength'),'Initial tension','How hard the trigger pushes against your finger. Zero gives free travel in ramp and detent modes.',['Free / light','Firm'])}
+    ${tensionSlider(k('start_pos'),'Resistance begins','Choose the travel zone where resistance starts. The device uses 10 discrete zones.',['At release','Deep in the pull'])}
+    <div data-end-strength ${shape !== 1 && shape !== 2 ? 'hidden' : ''}>${tensionSlider(k('strength_b'),'End / wall tension','In a ramp, this is the tension at full pull. In a detent, it is the wall tension.',['Free / light','Firm'])}</div>
+    <div data-break-point ${shape !== 2 && shape !== 3 ? 'hidden' : ''}>${tensionSlider(k('detent_pos'),'Wall / break position','Place the detent wall or requested snap-through point along the pull.',['Early','Late'])}</div>
+    <div data-gate-threshold ${mode !== 1 ? 'hidden' : ''}>${tensionSlider(k('threshold'),'Opposite trigger activation depth','How far to press the opposite trigger before this resistance becomes active.',['Shallow press','Full press'])}</div>
+    <p class="tension-warning" data-tension-warning>${tensionValue(side === 'L2' ? 'ce_l2_enable' : 'ce_r2_enable') ? 'A captured effect is enabled. Check its ownership setting below.' : shape === 3 ? 'Weapon break is limited to zones 3–8 and forced above the start zone.' : ''}</p>
+    <details><summary>Recoil &amp; vibration</summary>${recoil.map(f => tensionAdvancedField(f,side)).join('')}</details>
+    <details><summary>Button mapping &amp; captured effects</summary>${remaining.map(f => tensionAdvancedField(f,side)).join('')}</details>
+  </section>`;
+}
+function tensionAdvancedField(f,side){
+  return fieldRowHTML(f);
+}
+
+function triggerPairHTML(){
+  const shared = SECTIONS.find(s => s.title === R2_TITLE).fields.filter(f => SHARED_TRIGGER_KEYS.has(f[1]));
+  return `<div class="card tension-studio"><div class="card-title">Adaptive triggers</div>
+    <h2>Dial in the feel</h2><p class="tension-intro">Choose when resistance engages, then shape the tension through each pull. Changes are sent when you choose <b>Save to Device</b>.</p>
+    <p class="tension-help" id="tension-keys">Keyboard: Tab to a control; use arrow keys to adjust sliders, Home / End for the limits. Enter or Space opens advanced sections.</p>
+    <div class="tension-grid">${tensionCardHTML('L2')}${tensionCardHTML('R2')}</div>
+    <div class="tshared"><h3>Shared recoil source</h3>${shared.map(f => tensionAdvancedField(f,'Both triggers')).join('')}</div></div>`;
+}
+
 
 function render(){
   const app=document.getElementById('app');
@@ -5673,6 +6040,9 @@ function render(){
   const _qEl = (typeof document !== 'undefined') ? document.activeElement : null;
   const _qFocused = !!(_qEl && _qEl.id === 'qbox');
   const _qCaret = _qFocused ? _qEl.selectionStart : 0;
+  const _focusId = _qEl && _qEl.id;
+  const _expanded = new Map(typeof document.querySelectorAll === 'function' ?
+    [...document.querySelectorAll('details[id]')].map(d => [d.id,d.open]) : []);
   let html = `<h1>DS5 Studio Bridge <span style="font-size:13px;color:var(--sub)">v1.42.0</span></h1>
     <div class="status-bar"><div class="dot ${on?'on':''}"></div>
       <span style="flex:1">${on?`Connected — ${device.productId===DSE_PID?'DualSense Edge':'DualSense'}${fwVer?` · FW v${fwVer.maj}.${fwVer.min}.${fwVer.pat} · config v${fwVer.cfgv}`:` · FW: pre-1.0.5 (no version fields)`}`:'Not connected'}</span>
@@ -5689,32 +6059,21 @@ function render(){
   // from; clicking any tab clears the search and returns to that page.
   const q = (window._q || '').trim();
   const groups = q ? searchResults(q) : [];
-  html += `<div class="tabbar">` + TABS.map(t =>
-      `<button class="tab ${(!q && t.id===tab)?'active':''}" onclick="setTab('${t.id}')">${t.label}</button>`
-    ).join('') + `</div>`;
+  html += `<nav class="tabbar" aria-label="Configuration pages">` + TABS.map(t =>
+      `<button class="tab ${(!q && t.id===tab)?'active':''}" id="tab_${t.id}" ${!q && t.id===tab?'aria-current="page"':''} onclick="setTab('${t.id}')">${t.label}</button>`
+    ).join('') + `</nav>`;
   html += searchBarHTML(q, groups);
 
   if (q){
     html += searchResultsHTML(q, groups);
   } else {
+  html += studioPageHTML(tab);
+  if (tab === 'triggers') html += triggerPairHTML();
   for(const section of SECTIONS){
     if ((SECTION_TAB[section.title] || 'device') !== tab) continue;
     if (section.title === L2_TITLE) continue;              // drawn beside R2
-    if (section.title === R2_TITLE) { html += triggerPairHTML(); continue; }
-    html += `<div class="card"><div class="card-title">${section.title}</div>`;
-    for(const f of section.fields) html += fieldRowHTML(f);
-    // The stage rows belong INSIDE their own section, directly under the enable
-    // they depend on - not appended after every other card at the foot of the
-    // page, where the Save button sits between a setting and its switch.
-    if (section.title === 'Battery Notification') html += battStagesPanelHTML();
-    if (section.title === 'Tilt Steering (experimental)') {
-      html += '<div style="font-size:12px;color:var(--sub);margin-top:6px">' +
-              'Calibrate with <b>Start live test</b> on the Macros tab: roll the pad and watch the ' +
-              '<b>L stick</b> figure. That is the value the game receives, so you can see the offset ' +
-              'appear and size it against the game\'s own steering dead zone \u2014 a setting that looks ' +
-              'active here can still be swallowed before it reaches the car.</div>';
-    }
-    html += `</div>`;
+    if (section.title === R2_TITLE) continue;
+    html += studioSectionHTML(section);
     // BRACES MATTER HERE: the single-statement form let the two lines added
     // below run for EVERY section on EVERY tab, emitting the audio panel over
     // and over. The duplicate-id check caught it; nothing about the page looked
@@ -5815,7 +6174,7 @@ function render(){
       <button class="btn btn-outline" style="padding:2px 10px;margin-top:4px" onclick="calSend()">1. Send 6500</button>
       <button class="btn btn-outline" style="padding:2px 10px;margin-top:4px" onclick="calSendHalf()">Send 3250 (check)</button>
       <span style="font-size:12px">2. how far did the view turn?
-        <input id="calobs" type="number" min="1" max="3600" step="1" value="180" style="width:70px"> \u00b0
+        <input id="calobs" aria-label="Observed view rotation in degrees" type="number" min="1" max="3600" step="1" value="180" style="width:70px"> \u00b0
       </span>
       <button class="btn btn-outline" style="padding:2px 10px" onclick="calCompute()">3. Work it out</button>
       <div id="calbox" style="font-size:12px;margin-top:6px">Switch to the game first \u2014 the counts go wherever the mouse pointer would.</div>
@@ -5846,6 +6205,8 @@ function render(){
   }
   try { if (typeof cebRender === 'function') cebRender(); } catch(e){}
   try { if (typeof cebShowLevels === 'function') cebShowLevels(); } catch(e){}
+  for (const [id,open] of _expanded){ const d=document.getElementById(id); if(d) d.open=open; }
+  if (!_qFocused && _focusId) document.getElementById(_focusId)?.focus();
 }
 
 render();

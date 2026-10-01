@@ -20,7 +20,7 @@ for (const t of M.TABS){
   M.setTab(t.id);
   try { M.render(); } catch(e){ console.log(`  ${t.id}: RENDER THREW ${e.message}`); continue; }
   const html = captured;
-  const keys = [...html.matchAll(/config\['([a-z0-9_]+)'\]/g)].map(m=>m[1]);
+  const keys = [...html.matchAll(/(?:config\['|(?:tensionSet|studioSet)\(')([a-z0-9_]+)'/g)].map(m=>m[1]);
   keys.forEach(k=>seen.add(k));
   const cards = [...html.matchAll(/class="card-title">([^<]{0,44})/g)].map(m=>m[1].trim());
   report.push(`  ${t.label.padEnd(15)} ${String(new Set(keys).size).padStart(2)} fields | cards: ${cards.join(' · ') || '(none)'}`);

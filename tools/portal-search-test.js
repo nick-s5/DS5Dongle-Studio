@@ -92,7 +92,7 @@ console.log('\n4. results render and stay bound');
 P.setQ('rumble'); P.render();
 let h = ctx.document.getElementById('app').innerHTML;
 const rumbleKeys = keysFor('rumble');
-for (const k of rumbleKeys) ok(h.includes(`config['${k}']`), `result row for ${k} is bound to config['${k}']`);
+for (const k of rumbleKeys) ok(h.includes(`config['${k}']`) || h.includes(`studioSet('${k}'`), `result row for ${k} is bound to its config field`);
 ok(!h.includes('class="tab active"'), 'no tab is marked active during a search');
 ok(h.includes('Save to Device'), 'the actions bar (Save to Device) stays available');
 ok(h.includes('tab</span>'), 'each result card names the tab the setting lives on');

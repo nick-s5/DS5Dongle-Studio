@@ -1,0 +1,35 @@
+// Tension edits must preserve the firmware field keys, bounds and explicit save.
+const fs = require('fs'), assert = require('assert');
+const html = fs.readFileSync(process.argv[2] || 'ds5-config-portal.html', 'utf8');
+const js = html.match(/<script>([\s\S]*?)<\/script>/)[1];
+const cut = js.indexOf('\nrender();\nportalSelfCheck();');
+const win = {};
+const doc = {getElementById:()=>null,querySelector:()=>null,addEventListener(){}};
+const M = new Function('window','document','navigator','setInterval',js.slice(0,cut)+`
+  return {config, tensionSet, tensionDiagram, triggerPairHTML, tensionSlider};
+`)(win,doc,{hid:{addEventListener(){}}},()=>0);
+M.tensionSet('at_l2_strength',200);
+assert.equal(M.config.at_l2_strength,100);
+assert.equal(win._dirty.at_l2_strength,1);
+assert.equal(M.config.at_strength,undefined);
+M.tensionSet('at_strength',-12);
+assert.equal(M.config.at_strength,0);
+M.tensionSet('at_start_pos',5.7);
+assert.equal(M.config.at_start_pos,6);
+M.tensionSet('at_start_pos','invalid');
+assert.equal(M.config.at_start_pos,6);
+Object.assign(M.config,{at_mode:2,at_shape:1,at_strength:20,at_strength_b:80});
+assert.match(M.tensionDiagram('R2'),/Progressive ramp/);
+assert.match(M.tensionDiagram('R2'),/Ends at 80%/);
+M.config.at_mode=0;
+assert.match(M.tensionDiagram('R2'),/resistance is off/);
+const editor=M.triggerPairHTML();
+assert.equal((editor.match(/class="tension-card"/g)||[]).length,2);
+assert.ok(editor.indexOf('id="tension_L2"')<editor.indexOf('id="tension_R2"'));
+assert.match(editor,/type="range"/);
+assert.match(editor,/aria-describedby="th_at_strength"/);
+assert.match(editor,/<label for="te_at_strength">/);
+assert.match(editor,/<details><summary>Recoil/);
+assert.match(editor,/changes are sent/i);
+assert.ok(!/saveAll\(\)/.test(editor),'editing must not save automatically');
+console.log('TENSION TEST OK: bounds, independent triggers, dirty fields, diagrams and accessible controls');
